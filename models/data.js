@@ -43,9 +43,13 @@ const createData = async (username,newData) => {
 
         const index = file.users.findIndex((user) => user.username === username);
         if (index >= 0) {
-            file.users[index].content.push(newData);
-            await writeJSONFile(file);
-            return {newData};
+            if (!file.users[index].content.find((data) => data.key === key)) {
+                file.users[index].content.push(newData);
+                await writeJSONFile(file);
+                return {newData};
+            }
+            else
+                return 400;
         }
         else
             return 500;

@@ -8,8 +8,14 @@ const newData = async (request, reply) => {
     if(base64regex.test(newData.data)) {
         const createdData = await dataModel.createData(request.user.username, {key: newData.key, data: newData.data});
         if (createdData !== 500) {
-            reply.statusCode = 201;
-            reply.send(createdData);
+            if(createdData !== 400) {
+                reply.statusCode = 201;
+                reply.send(createdData);
+            }
+            else{
+                reply.statusCode = 400;
+                reply.send({status:400,message:"Chiave presente"});
+            }
         }
         else{
             reply.statusCode = 500;
