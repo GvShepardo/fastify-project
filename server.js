@@ -1,16 +1,16 @@
-import Fastify from 'fastify'
-const fastify = Fastify({
+const fastify = require('fastify')({
     logger: true
 })
 
-// Declare a route
-fastify.get('/', async function handler (request, reply) {
-    return { hello: 'world' }
-})
+
+//router
+fastify.register(require('./routes/user'), { prefix: 'api/' });
+fastify.register(require('./routes/data'), { prefix: 'api/' });
+
 
 // Run the server!
 try {
-    await fastify.listen({ port: 3000 })
+        fastify.listen({ port: 3000 })
 } catch (err) {
     fastify.log.error(err)
     process.exit(1)
