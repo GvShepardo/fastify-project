@@ -40,7 +40,7 @@ const getData = async (username,key) => {
 const createData = async (username,newData) => {
     try {
         let file = await readJSONFile();
-
+        const key = newData.key;
         const index = file.users.findIndex((user) => user.username === username);
         if (index >= 0) {
             if (!file.users[index].content.find((data) => data.key === key)) {

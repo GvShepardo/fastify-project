@@ -4,9 +4,13 @@ const dataModel = require('../models/data');
 const newData = async (request, reply) => {
     const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
     const newData = request.body;
+    let username = request.user.username;
+    if(request.user.type === "admin" && request.body.username){
+        username = request.body.username;
+    }
     // Logica per creare un nuovo utente nel modello
     if(base64regex.test(newData.data)) {
-        const createdData = await dataModel.createData(request.user.username, {key: newData.key, data: newData.data});
+        const createdData = await dataModel.createData(username, {key: newData.key, data: newData.data});
         if (createdData !== 500) {
             if(createdData !== 400) {
                 reply.statusCode = 201;
@@ -30,9 +34,22 @@ const newData = async (request, reply) => {
 
 const deleteData = async (request, reply) => {
     // Logica per cancellare dati
-    const user = request.user;
     const key = request.params.key;
-    const result = await dataModel.deleteData(user.username,key);
+    let username = request.user.username;
+    console.log(username);
+    console.log(request.user.type);
+    if(request.query.username) {
+        if (request.user.type === "admin") {
+            username = request.query.username;
+        }
+        else{
+            if(request.user.username !== request.query.username) {
+                reply.statusCode = 403;
+                reply.send({status: 403, message: "User non e' admin"});
+            }
+        }
+    }
+    const result = await dataModel.deleteData(username,key);
     console.log(result);
     if(result !== 500) {
         if (result) {
@@ -49,10 +66,20 @@ const deleteData = async (request, reply) => {
     }
 };
 const getData = async (request, reply) => {
-    const user = request.user;
     const key = request.params.key;
-    const result = await dataModel.getData(user.username,key);
-    console.log(result);
+    let username = request.user.username;
+    if(request.query.username) {
+        if (request.user.type === "admin") {
+            username = request.query.username;
+        }
+        else{
+            if(request.user.username !== request.query.username){
+                reply.statusCode = 403;
+                reply.send({status:403, message:"User non e' admin"});
+            }
+        }
+    }
+    const result = await dataModel.getData(username,key);
     if(result !== 500) {
         if (result) {
             reply.statusCode = 200;
@@ -71,11 +98,14 @@ const getData = async (request, reply) => {
 
 const patchData = async (request,reply) => {
     const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-    const user = request.user;
     const key = request.params.key;
     const body = request.body;
+    let username = request.user.username;
+    if(request.user.type === "admin" && request.body.username){
+        username = request.body.username;
+    }
     if(base64regex.test(body.data)) {
-        const result = await dataModel.patchData(user.username, key, body);
+        const result = await dataModel.patchData(username, key, body);
         if(result !== 500) {
             if (result) {
                 reply.statusCode = 200;
