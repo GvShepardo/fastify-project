@@ -23,10 +23,10 @@ const writeJSONFile = async (data) => {
     }
 };
 
-const getData = async (username,key) => {
+const getData = async (email,key) => {
     try {
         const file = await readJSONFile();
-        const user = file.users.find((user) => user.username === username);
+        const user = file.users.find((user) => user.email === email);
         if(!user){
             return 500;
         }
@@ -37,11 +37,11 @@ const getData = async (username,key) => {
     }
 };
 
-const createData = async (username,newData) => {
+const createData = async (email,newData) => {
     try {
         let file = await readJSONFile();
         const key = newData.key;
-        const index = file.users.findIndex((user) => user.username === username);
+        const index = file.users.findIndex((user) => user.email === email);
         if (index >= 0) {
             if (!file.users[index].content.find((data) => data.key === key)) {
                 file.users[index].content.push(newData);
@@ -58,10 +58,10 @@ const createData = async (username,newData) => {
     }
 };
 
-const patchData = async (username, key, body) => {
+const patchData = async (email, key, body) => {
     try {
         const file = await readJSONFile();
-        let userIndex = file.users.findIndex((user) => user.username === username);
+        let userIndex = file.users.findIndex((user) => user.email === email);
         if (userIndex === -1) {
             return 500;
         }
@@ -81,10 +81,10 @@ const patchData = async (username, key, body) => {
     }
 };
 
-const deleteData = async (username,key) => {
+const deleteData = async (email,key) => {
     try {
         const file = await readJSONFile();
-        let userIndex = file.users.findIndex((user) => user.username === username);
+        let userIndex = file.users.findIndex((user) => user.email === email);
         if (userIndex === -1) {
             return 500;
         }

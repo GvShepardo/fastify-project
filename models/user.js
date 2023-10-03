@@ -35,7 +35,7 @@ const getAllUsers = async () => {
 const getUserByName = async (name) => {
     try {
         const file = await readJSONFile();
-        const user = file.users.find((user) => user.username === name);
+        const user = file.users.find((user) => user.email === name);
         return user;
     } catch (error) {
         throw error;
@@ -46,16 +46,16 @@ const createUser = async (newData) => {
     try {
         let file = await readJSONFile();
         const newUser = {
-            username: newData.username,
+            email: newData.email,
             password: newData.password,
             type: newData.type,
             content: []
         };
-        const index = file.users.findIndex((user) => user.username === newData.username);
+        const index = file.users.findIndex((user) => user.email === newData.email);
         if (index === -1) {
             file.users.push(newUser);
             await writeJSONFile(file);
-            return {username:newUser.username,type:newUser.type};
+            return {email:newUser.email,type:newUser.type};
         }
         else
             return 400;
@@ -64,10 +64,10 @@ const createUser = async (newData) => {
     }
 };
 
-const deleteUser = async (username) => {
+const deleteUser = async (email) => {
     try {
         const file = await readJSONFile();
-        const index = file.users.findIndex((user) => user.username === username);
+        const index = file.users.findIndex((user) => user.email === email);
         if (index === -1) {
             return 500;
         }

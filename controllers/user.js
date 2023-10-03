@@ -13,15 +13,15 @@ fastify.register(fastifyCookie, {
 });
 
 const loginUser = async (request, reply) => {
-    const username = request.body.username;
+    const email = request.body.email;
     const hashedPassword = hashPassword(request.body.password);
     // Logica per creare un nuovo utente nel modello
-    const user = await userModel.getUserByName(username);
+    const user = await userModel.getUserByName(email);
     if(user){
         const isCorrect  = crypto.timingSafeEqual(Buffer.from(hashedPassword),Buffer.from(user.password));
         if(isCorrect){
             reply.statusCode = 200;
-            reply.header('Set-Cookie', `token=${generateToken({username:user.username,type:user.type})}; HttpOnly; Path=/; Max-Age=3600`);
+            reply.header('Set-Cookie', `token=${generateToken({email:user.email,type:user.type})}; HttpOnly; Path=/; Max-Age=3600`);
             reply.send();
         }
         else{
@@ -38,17 +38,26 @@ const loginUser = async (request, reply) => {
 // Crea un nuovo utente
 const createUser = async (request, reply) => {
     const newUser = request.body;
-    // Logica per creare un nuovo utente nel modello
-    const createdUser = await userModel.createUser({username:newUser.username,password:hashPassword(newUser.password),type:"user"});
-    if(createdUser !== 400) {
-        if (createdUser) {
-            reply.statusCode = 201;
-            reply.send(createdUser);
-        }
-    }
-    else{
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if(!emailRegex.test(newUser.email)){
         reply.statusCode = 400;
-        reply.send({status:400,message:"User esistente"})
+        reply.send({status:400,message:"Email non valida"});
+    }
+    else {
+        const createdUser = await userModel.createUser({
+            email: newUser.email,
+            password: hashPassword(newUser.password),
+            type: "user"
+        });
+        if (createdUser !== 400) {
+            if (createdUser) {
+                reply.statusCode = 201;
+                reply.send(createdUser);
+            }
+        } else {
+            reply.statusCode = 400;
+            reply.send({status: 400, message: "User esistente"})
+        }
     }
 };
 
@@ -56,7 +65,7 @@ const createUser = async (request, reply) => {
 const deleteUser = async (request, reply) => {
     // Logica per cancellare un utente dal modello
     const user = request.user;
-    const result = await userModel.deleteUser(user.username);
+    const result = await userModel.deleteUser(user.email);
     console.log(result);
     if(result !== 500) {
         if (result) {

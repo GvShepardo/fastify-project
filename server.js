@@ -4,8 +4,8 @@ const fastify = require('fastify')({
 
 
 //router
-fastify.register(require('./routes/user'), { prefix: 'api/' });
-fastify.register(require('./routes/data'), { prefix: 'api/' });
+fastify.register(require('./routes/user'));
+fastify.register(require('./routes/data'));
 
 
 // Run the server!
@@ -15,3 +15,4 @@ try {
     fastify.log.error(err)
     process.exit(1)
 }
+module.exports = fastify;

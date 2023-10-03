@@ -13,6 +13,8 @@
   "dependencies": {
     "fastify": "^4.23.2",
     "fastify-cookie": "^5.7.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "light-my-request": "^5.11.0",
+    "tap": "^18.4.2"
   }
 }
