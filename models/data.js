@@ -1,5 +1,3 @@
-// models/data.js
-
 const fs = require('fs/promises');
 
 const jsonFilePath = 'db.json'; // percorso del file JSON

@@ -1,8 +1,6 @@
-// models/user.js
+const fs = require('fs/promises');
 
-const fs = require('fs/promises'); // Utilizziamo fs.promises per gestire le operazioni asincrone
-
-const jsonFilePath = 'db.json'; // Il percorso del tuo file JSON
+const jsonFilePath = 'db.json'; // Il percorso del file JSON
 
 // Funzione per leggere il file JSON
 const readJSONFile = async () => {

@@ -1,8 +1,12 @@
-// controllers/data.js
 const dataModel = require('../models/data');
 // Crea un nuovi dati
 const newData = async (request, reply) => {
     const newData = request.body;
+    if(!newData.key || newData.key === ""){
+        reply.statusCode = 400;
+        reply.send({status:400,message:"Chiave non specificata"});
+        return;
+    }
     let email = request.user.email;
     if(request.body.email) {
         if (request.user.type === "admin") {
@@ -14,7 +18,6 @@ const newData = async (request, reply) => {
             return;
         }
     }
-    // Logica per creare un nuovo dato
     const createdData = await dataModel.createData(email, {key: newData.key, data: newData.data});
     if(createdData === 404){
         reply.statusCode = 404;
@@ -34,8 +37,8 @@ const newData = async (request, reply) => {
     }
 };
 
+//Cancella un dato
 const deleteData = async (request, reply) => {
-    // Logica per cancellare dati
     const key = request.params.key;
     let email = request.user.email;
     if(request.query.email) {

@@ -1,4 +1,3 @@
-// server.test.js
 const { test } = require('tap');
 const fastify = require('./server');
 

@@ -1,4 +1,3 @@
-// controllers/user.js
 const userModel = require('../models/user');
 const crypto = require('crypto');
 const {generateToken} = require("../tokenMiddleware");
@@ -6,7 +5,7 @@ const {generateToken} = require("../tokenMiddleware");
 const loginUser = async (request, reply) => {
     const email = request.body.email;
     const hashedPassword = hashPassword(request.body.password);
-    // Logica per creare un nuovo utente nel modello
+    // Logica per login
     const user = await userModel.getUserByName(email);
     if(user){
         if(user.hasOwnProperty('status')){

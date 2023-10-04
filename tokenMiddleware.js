@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = 'supersecret'; // Sostituisci con una chiave segreta sicura
+const SECRET_KEY = 'F75778F7425BE4DB0369D09AF37A6C2B9A83DEA0E53E7BD57412E4B060E607F7';
 
 // Middleware per verificare il token JWT
 const verifyToken = (request, reply, done) => {
