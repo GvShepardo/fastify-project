@@ -10,7 +10,8 @@ const readJSONFile = async () => {
         const data = await fs.readFile(jsonFilePath, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        throw error;
+        console.log(error);
+        return {status:500,error:error};
     }
 };
 
@@ -26,9 +27,12 @@ const writeJSONFile = async (data) => {
 const getData = async (email,key) => {
     try {
         const file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         const user = file.users.find((user) => user.email === email);
         if(!user){
-            return 500;
+            return 404;
         }
         const desiredData = user.content.find((data) => data.key === key);
         return desiredData;
@@ -40,6 +44,9 @@ const getData = async (email,key) => {
 const createData = async (email,newData) => {
     try {
         let file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         const key = newData.key;
         const index = file.users.findIndex((user) => user.email === email);
         if (index >= 0) {
@@ -47,12 +54,10 @@ const createData = async (email,newData) => {
                 file.users[index].content.push(newData);
                 await writeJSONFile(file);
                 return {newData};
-            }
-            else
+            } else
                 return 400;
-        }
-        else
-            return 500;
+        } else
+            return 404;
     } catch (error) {
         console.log(error);
     }
@@ -61,9 +66,12 @@ const createData = async (email,newData) => {
 const patchData = async (email, key, body) => {
     try {
         const file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         let userIndex = file.users.findIndex((user) => user.email === email);
         if (userIndex === -1) {
-            return 500;
+            return 404;
         }
         console.log(userIndex);
         let dataIndex = file.users[userIndex].content.findIndex((data) => data.key === key);
@@ -84,9 +92,12 @@ const patchData = async (email, key, body) => {
 const deleteData = async (email,key) => {
     try {
         const file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         let userIndex = file.users.findIndex((user) => user.email === email);
         if (userIndex === -1) {
-            return 500;
+            return 404;
         }
         let dataIndex = file.users[userIndex].content.findIndex((data) => data.key === key);
         if (dataIndex === -1) {

@@ -51,7 +51,7 @@ test('Test Login endpoint', async (t) => {
             password:"password"
         },
     });
-    t.equal(response.statusCode,404);
+    t.equal(response.statusCode,400);
 
     //Password sbagliata
     response = await fastify.inject({
@@ -131,6 +131,19 @@ test('Test Post Data endpoint', async (t) => {
         },
         payload:{
             key:"key1",
+            data:">"
+        },
+    });
+    t.equal(response.statusCode, 400);
+
+    // Input malformato
+    response = await fastify.inject({
+        method: 'POST',
+        url: '/data',
+        headers:{
+            Authorization: `Bearer ${token}`
+        },
+        payload:{
             data:">"
         },
     });
@@ -272,7 +285,7 @@ test('Test Admin Login endpoint', async (t) => {
         method: 'POST',
         url: '/login',
         payload: {
-            email:"admin",
+            email:"admin@admin.com",
             password:"password"
         },
     });
@@ -295,6 +308,21 @@ test('Test Admin Create Data endpoint', async (t) => {
     });
     t.equal(response.statusCode, 201);
 
+    // User non esiste
+    response = await fastify.inject({
+        method: 'POST',
+        url: '/data',
+        headers:{
+            Authorization: `Bearer ${tokenAdmin}`
+        },
+        payload:{
+            email:"nonexisting@example.com",
+            key:"key",
+            data:"dati"
+        },
+    });
+    t.equal(response.statusCode, 404);
+
     //Non Admin
     response = await fastify.inject({
         method: 'POST',
@@ -303,7 +331,7 @@ test('Test Admin Create Data endpoint', async (t) => {
             Authorization: `Bearer ${token}`
         },
         payload:{
-            email:"admin",
+            email:"user1@mail.com",
             key:"key",
             data:"pruzzg=="
         },
@@ -322,10 +350,21 @@ test('Test Admin Get Data endpoint', async (t) => {
     });
     t.equal(response.statusCode, 200);
 
+    // User non esiste
+    response = await fastify.inject({
+        method: 'GET',
+        url: '/data/key?email=nonexisting@example.com',
+        headers:{
+            Authorization: `Bearer ${tokenAdmin}`
+        }
+    });
+    t.equal(response.statusCode, 404);
+
+
     // Non Admin
     response = await fastify.inject({
         method: 'GET',
-        url: '/data/key?email=admin',
+        url: '/data/key?email=admin@admin.com',
         headers:{
             Authorization: `Bearer ${token}`
         }
@@ -348,6 +387,20 @@ test('Test Admin Patch Data endpoint', async (t) => {
     });
     t.equal(response.statusCode, 200);
 
+    // User non esiste
+    response = await fastify.inject({
+        method: 'PATCH',
+        url: '/data/key',
+        headers:{
+            Authorization: `Bearer ${tokenAdmin}`
+        },
+        payload:{
+            email:"nonexisting@example.com",
+            data:"dati"
+        },
+    });
+    t.equal(response.statusCode, 404);
+
     //Non Admin
     response = await fastify.inject({
         method: 'PATCH',
@@ -356,7 +409,7 @@ test('Test Admin Patch Data endpoint', async (t) => {
             Authorization: `Bearer ${token}`
         },
         payload:{
-            email:"admin",
+            email:"user1@mail.com",
             data:"datilok="
         },
     });
@@ -373,10 +426,20 @@ test('Test Admin Delete Data endpoint', async (t) => {
     });
     t.equal(response.statusCode, 200);
 
+    // User non esiste
+    response = await fastify.inject({
+        method: 'DELETE',
+        url: '/data/key?email=nonexisting@example.com',
+        headers:{
+            Authorization: `Bearer ${tokenAdmin}`
+        }
+    });
+    t.equal(response.statusCode, 404);
+
     // Non Admin
     response = await fastify.inject({
         method: 'DELETE',
-        url: '/data/key?email=admin',
+        url: '/data/key?email=user1@mail.com',
         headers:{
             Authorization: `Bearer ${token}`
         }

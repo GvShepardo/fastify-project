@@ -1,22 +1,10 @@
 {
   "users": [
     {
-      "email": "admin",
+      "email": "admin@admin.com",
       "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
       "type": "admin",
       "content": [
-        {
-          "key": "giorgio",
-          "data": "Y2lhbw=="
-        },
-        {
-          "key": "pietro",
-          "data": "cGlwcG8="
-        },
-        {
-          "key": "francesco",
-          "data": "cGlwcG8="
-        },
         {
           "key": "key",
           "data": "dati"
@@ -25,6 +13,12 @@
     },
     {
       "email": "user1@mail.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+      "type": "user",
+      "content": []
+    },
+    {
+      "email": "user2@mail.com",
       "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
       "type": "user",
       "content": []

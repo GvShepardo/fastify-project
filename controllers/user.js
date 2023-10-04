@@ -1,16 +1,7 @@
 // controllers/user.js
-const fastify = require('fastify')({
-    logger: true
-})
 const userModel = require('../models/user');
 const crypto = require('crypto');
-const fastifyCookie = require('fastify-cookie');
 const {generateToken} = require("../tokenMiddleware");
-
-fastify.register(fastifyCookie, {
-    secret: 'cookiesecret', // Chiave segreta per firmare i cookie
-    httpOnly: true, // Imposta su true per abilitare i cookie HttpOnly
-});
 
 const loginUser = async (request, reply) => {
     const email = request.body.email;
@@ -18,45 +9,50 @@ const loginUser = async (request, reply) => {
     // Logica per creare un nuovo utente nel modello
     const user = await userModel.getUserByName(email);
     if(user){
-        const isCorrect  = crypto.timingSafeEqual(Buffer.from(hashedPassword),Buffer.from(user.password));
-        if(isCorrect){
-            reply.statusCode = 200;
-            reply.header('Set-Cookie', `token=${generateToken({email:user.email,type:user.type})}; HttpOnly; Path=/; Max-Age=3600`);
-            reply.send();
+        if(user.hasOwnProperty('status')){
+            reply.statusCode = 500;
+            reply.send(user);
         }
-        else{
-            reply.statusCode = 400;
-            reply.send({status:400,message:"incorrect password"});
+        else {
+            const isCorrect = crypto.timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(user.password));
+            if (isCorrect) {
+                reply.statusCode = 200;
+                reply.header('Set-Cookie', `token=${generateToken({
+                    email: user.email,
+                    type: user.type
+                })}; HttpOnly; Path=/; Max-Age=3600`);
+                reply.send();
+            } else {
+                reply.statusCode = 400;
+                reply.send({status: 400, message: "username o password errati"});
+            }
         }
     }
     else{
-        reply.statusCode = 404;
-        reply.send({status:404,message:"user not found"});
+        reply.statusCode = 400;
+        reply.send({status:400,message:"username o password errati"});
     }
 };
 
 // Crea un nuovo utente
 const createUser = async (request, reply) => {
     const newUser = request.body;
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if(!emailRegex.test(newUser.email)){
+    const createdUser = await userModel.createUser({
+        email: newUser.email,
+        password: hashPassword(newUser.password),
+        type: "user"
+    });
+    if (createdUser === 400) {
         reply.statusCode = 400;
-        reply.send({status:400,message:"Email non valida"});
-    }
-    else {
-        const createdUser = await userModel.createUser({
-            email: newUser.email,
-            password: hashPassword(newUser.password),
-            type: "user"
-        });
-        if (createdUser !== 400) {
-            if (createdUser) {
-                reply.statusCode = 201;
-                reply.send(createdUser);
-            }
-        } else {
-            reply.statusCode = 400;
-            reply.send({status: 400, message: "User esistente"})
+        reply.send({status: 400, message: "User esistente"})
+    } else if(createdUser){
+        if (createdUser.hasOwnProperty('status')) {
+            reply.statusCode = 500;
+            reply.send(createdUser);
+        }
+        else{
+            reply.statusCode = 201;
+            reply.send(createdUser);
         }
     }
 };
@@ -66,17 +62,20 @@ const deleteUser = async (request, reply) => {
     // Logica per cancellare un utente dal modello
     const user = request.user;
     const result = await userModel.deleteUser(user.email);
-    console.log(result);
-    if(result !== 500) {
-        if (result) {
+    if (result) {
+        if(result.hasOwnProperty('status')){
+            reply.statusCode = 500;
+            reply.send(result);
+        }
+        else {
             reply.statusCode = 204;
             reply.header('Set-Cookie', `token=; HttpOnly; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`);
             reply.send();
         }
     }
     else{
-        reply.statusCode = 500;
-        reply.send({status: 500, message:"Utente non trovato"})
+        reply.statusCode = 404;
+        reply.send({status: 404, message:"Utente non trovato"})
     }
 };
 

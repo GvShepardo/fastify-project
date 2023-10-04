@@ -10,7 +10,8 @@ const readJSONFile = async () => {
         const data = await fs.readFile(jsonFilePath, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        throw error;
+        console.log(error);
+        return {status:500,error:error};
     }
 };
 
@@ -19,32 +20,29 @@ const writeJSONFile = async (data) => {
     try {
         await fs.writeFile(jsonFilePath, JSON.stringify(data, null, 2), 'utf8');
     } catch (error) {
-        throw error;
+        console.log(error);
+        return {status:500,error:error};
     }
 };
-
-const getAllUsers = async () => {
-    try {
-        const file = await readJSONFile();
-        return file;
-    } catch (error) {
-        throw error;
-    }
-};
-
 const getUserByName = async (name) => {
     try {
         const file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         const user = file.users.find((user) => user.email === name);
         return user;
     } catch (error) {
-        throw error;
+        console.log(error);
     }
 };
 
 const createUser = async (newData) => {
     try {
         let file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         const newUser = {
             email: newData.email,
             password: newData.password,
@@ -60,13 +58,16 @@ const createUser = async (newData) => {
         else
             return 400;
     } catch (error) {
-        console.log(error);
+        return 500;
     }
 };
 
 const deleteUser = async (email) => {
     try {
         const file = await readJSONFile();
+        if(file.status === 500){
+            return file;
+        }
         const index = file.users.findIndex((user) => user.email === email);
         if (index === -1) {
             return 500;
@@ -81,7 +82,6 @@ const deleteUser = async (email) => {
 };
 
 module.exports = {
-    getAllUsers,
     getUserByName,
     createUser,
     deleteUser,
