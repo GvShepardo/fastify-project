@@ -46,6 +46,7 @@ const createData = async (email,newData) => {
             return file;
         }
         const key = newData.key;
+        //Recupera l'index dell'utente e aggiunge il nuovo dato nel suo array 'content[]' se la chiave non esiste
         const index = file.users.findIndex((user) => user.email === email);
         if (index >= 0) {
             if (!file.users[index].content.find((data) => data.key === key)) {
@@ -67,6 +68,7 @@ const patchData = async (email, key, body) => {
         if(file.status === 500){
             return file;
         }
+        //Recupera index di user nel db, recupera index della key in content[] e modifica il campo 'data'
         let userIndex = file.users.findIndex((user) => user.email === email);
         if (userIndex === -1) {
             return 404;
@@ -93,6 +95,8 @@ const deleteData = async (email,key) => {
         if(file.status === 500){
             return file;
         }
+
+        //Recupera index di user nel db, recupera index della key in content[] e cancella l'elemento
         let userIndex = file.users.findIndex((user) => user.email === email);
         if (userIndex === -1) {
             return 404;

@@ -6,6 +6,7 @@ const loginUser = async (request, reply) => {
     const email = request.body.email;
     const hashedPassword = hashPassword(request.body.password);
     // Logica per login
+    // Chiama userModel.getUserByName per cercare nel db la mail specificata
     const user = await userModel.getUserByName(email);
     if(user){
         if(user.hasOwnProperty('status')){
@@ -13,7 +14,10 @@ const loginUser = async (request, reply) => {
             reply.send(user);
         }
         else {
+            //Check se la password è corretta
             const isCorrect = crypto.timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(user.password));
+
+            //Se corretta genera il token
             if (isCorrect) {
                 reply.statusCode = 200;
                 reply.header('Set-Cookie', `token=${generateToken({
@@ -67,6 +71,7 @@ const deleteUser = async (request, reply) => {
             reply.send(result);
         }
         else {
+            //Se l'user è stato cancellato cancella il cookie contenente il token
             reply.statusCode = 204;
             reply.header('Set-Cookie', `token=; HttpOnly; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`);
             reply.send();

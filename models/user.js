@@ -28,6 +28,7 @@ const getUserByName = async (name) => {
         if(file.status === 500){
             return file;
         }
+        //Recupera user dall'array users[]
         const user = file.users.find((user) => user.email === name);
         return user;
     } catch (error) {
@@ -47,6 +48,7 @@ const createUser = async (newData) => {
             type: newData.type,
             content: []
         };
+        //Controlla se l'email non è già presente, quindi aggiunge il nuovo utente all'array users[]
         const index = file.users.findIndex((user) => user.email === newData.email);
         if (index === -1) {
             file.users.push(newUser);
@@ -66,6 +68,7 @@ const deleteUser = async (email) => {
         if(file.status === 500){
             return file;
         }
+        //Recupera l'index di email dall'array users[] e cancella l'elemento se esiste
         const index = file.users.findIndex((user) => user.email === email);
         if (index === -1) {
             return 500;

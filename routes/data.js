@@ -1,6 +1,7 @@
 const dataController = require('../controllers/data');
 const {verifyToken} = require("../tokenMiddleware");
 
+//definisce schema
 const bodySchema = {
     type: 'object',
     properties: {

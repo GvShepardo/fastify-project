@@ -1,6 +1,7 @@
 const userController = require('../controllers/user');
 const {verifyToken} = require("../tokenMiddleware");
 
+//definisce schema
 const bodySchema = {
     type: 'object',
     properties: {
