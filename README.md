@@ -28,3 +28,7 @@ Per eseguire i test delle API utilizzando Tap e light-my-request, assicurati che
     npx tap server.test.js
 
 I test verranno eseguiti e dovresti vedere l'output dei risultati dei test nel terminale.
+
+## Testare le API con Postman
+
+È possibile testare le API manualmente con client Postman. È anche presente nella repository il file **HTTP.postman_collection.json** che contiene all'interno dei test predefiniti.
